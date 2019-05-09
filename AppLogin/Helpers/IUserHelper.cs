@@ -1,4 +1,5 @@
 ﻿using AppLogin.Models.Entities;
+using AppLogin.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -11,5 +12,7 @@ namespace AppLogin.Helpers
     {
         Task<User> FindUserByEmailAsync(string email);
         Task<IdentityResult> CreateUserAsync(User user, string password);
+        Task<SignInResult> LoginAsync(LoginViewModel model);
+        Task LogoutAsync();
     }
 }
