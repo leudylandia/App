@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using AppLogin.Models;
+using AppLogin.Models.Entities;
+using AppLogin.Helpers;
 
 namespace AppLogin.Controllers
 {
@@ -38,6 +40,11 @@ namespace AppLogin.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public async void Adduser()
+        {
+            
         }
     }
 }
