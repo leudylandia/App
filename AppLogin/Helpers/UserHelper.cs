@@ -19,9 +19,14 @@ namespace AppLogin.Helpers
             this._signInManager = signInManager;
         }
 
+        public async Task<IdentityResult> ChangePasswordAsync(User user, string oldpassword, string newPassword)
+        {
+            return await _userManager.ChangePasswordAsync(user, oldpassword, newPassword);
+        }
+
         public async Task<IdentityResult> CreateUserAsync(User user, string password)
         {
-            return await _userManager.CreateAsync(user, password);
+            return await _userManager.CreateAsync(user, password); 
         }
 
         public async Task<User> FindUserByEmailAsync(string email)
@@ -38,6 +43,11 @@ namespace AppLogin.Helpers
         public async Task LogoutAsync()
         {
             await _signInManager.SignOutAsync();
+        }
+
+        public async Task<IdentityResult> UpdateUserAsync(User user)
+        {
+            return await _userManager.UpdateAsync(user);
         }
     }
 }

@@ -38,7 +38,7 @@
                 <ul class="nav navbar-nav navbar-right">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <li><a asp-action="ChangerUser" asp-controller="Account">@this.User.Identity.Name</a></li>
+                        <li><a asp-action="ChangeUser" asp-controller="Account">@this.User.Identity.Name</a></li>
                         <li><a asp-action="Logout" asp-controller="Account">Logout</a></li>
                     }
                     else

@@ -70,6 +70,7 @@ namespace AppLogin.Controllers
 
                 if(user == null) //Verificamos si no encontro un usuario con ese correo para seguir 
                 {
+                    //TODO:
                     user = new User
                     {
                         Email = model.Username,
@@ -109,17 +110,87 @@ namespace AppLogin.Controllers
                     this.ModelState.AddModelError(string.Empty, "Could not be login.");
                     return View(model);
                 }
+
+                ModelState.AddModelError(string.Empty, "The username is alredy registerd.");
                 
             }
 
             return View(model);
         }
-
-
         public async Task<IActionResult> Logout()
         {
             await _userHelper.LogoutAsync();
             return RedirectToAction(nameof(AccountController.Index), "Home");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ChangeUser()
+        {
+            var user = await _userHelper.FindUserByEmailAsync(this.User.Identity.Name); //Buscamos el  usuario
+            var model = new ChangeUserViewModel();
+
+            if (user != null)
+            {
+                model.FirstName = user.Name;
+                model.LastName = user.LastName;
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeUser(ChangeUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.FindUserByEmailAsync(this.User.Identity.Name); //Buscamos el  usuario
+
+                if (user != null)
+                {
+                    user.Name = model.FirstName;
+                    user.LastName = model.LastName;
+                    var response = await _userHelper.UpdateUserAsync(user);
+
+                    if (response.Succeeded)
+                        ViewBag.UserMessage = "User updated!";
+                    else
+                        ModelState.AddModelError(string.Empty, response.Errors.FirstOrDefault().Description); //Puedes dar varios errores, estamos seleccionando el primero jsjs
+                }
+            }
+            else
+                ModelState.AddModelError(string.Empty, "User no found");
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.FindUserByEmailAsync(this.User.Identity.Name);
+
+                if (user != null)
+                {
+                    var result = await _userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                    if (result.Succeeded)
+                        return RedirectToAction("ChangeUser");
+                    else
+                        ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault().Description);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "User not found.");
+                }
+            }
+
+            return View(model);
         }
     }
 
