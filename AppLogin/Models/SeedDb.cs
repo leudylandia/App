@@ -25,10 +25,13 @@ namespace AppLogin.Models
         {
             await context.Database.EnsureCreatedAsync();
 
+            await _userHelper.CheckRoleAsync("Admin");
+            await _userHelper.CheckRoleAsync("Customer");
+
             var user = await this._userHelper.FindUserByEmailAsync("leudylandia26@hotmail.com");
 
            if(user == null)
-            {
+           {
                 user = new User
                 {
                     Name = "Leudy David",
@@ -36,13 +39,22 @@ namespace AppLogin.Models
                     Email = "leudylandia26@hotmail.com",
                     UserName = "leudylandia26@hotmail.com"
                 };
-            }
 
-            var result = await _userHelper.CreateUserAsync(user, "123456");
+                var result = await _userHelper.CreateUserAsync(user, "123456");
 
-            if (result !=IdentityResult.Success)
+                if (result != IdentityResult.Success)
+                {
+                    throw new InvalidOperationException("No se pudo mi hermnao " + result.ToString());
+                }
+
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
+           }
+
+            //Si el usuario ya est acreado verificamos si pertenece algun rol
+            var isInrole = await _userHelper.IsUserInRoleAsync(user, "Admin");
+            if (!isInrole)
             {
-                throw new InvalidOperationException("No se pudo mi hermnao " + result.ToString());
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
             }
         }
 

@@ -12,16 +12,38 @@ namespace AppLogin.Helpers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserHelper(UserManager<User> userManager, SignInManager<User> signInManager)
+        public UserHelper(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager)
         {
             this._userManager = userManager;
             this._signInManager = signInManager;
+            this._roleManager = roleManager;
+        }
+
+        //Añade un role al usuario, le pasamos  el usuario y el role
+        public async Task AddUserToRoleAsync(User user, string roleName)
+        {
+            await _userManager.AddToRoleAsync(user, roleName);
         }
 
         public async Task<IdentityResult> ChangePasswordAsync(User user, string oldpassword, string newPassword)
         {
             return await _userManager.ChangePasswordAsync(user, oldpassword, newPassword);
+        }
+
+        public async Task CheckRoleAsync(string roleName)
+        {
+            //Verifica si el roleName existe de lo contrario lo creamos
+            var roleExists = await _roleManager.RoleExistsAsync(roleName);
+
+            if (!roleExists)
+            {
+                await _roleManager.CreateAsync(new IdentityRole
+                {
+                    Name = roleName
+                });
+            }
         }
 
         public async Task<IdentityResult> CreateUserAsync(User user, string password)
@@ -33,6 +55,12 @@ namespace AppLogin.Helpers
         {
             var user = await _userManager.FindByEmailAsync(email);
             return user;
+        }
+
+        //Verifica si el usuario pertenece a ese rol
+        public async Task<bool> IsUserInRoleAsync(User user, string roleName)
+        {
+            return await _userManager.IsInRoleAsync(user, roleName);
         }
 
         public async Task<SignInResult> LoginAsync(LoginViewModel model)

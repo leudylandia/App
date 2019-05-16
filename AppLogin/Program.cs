@@ -30,7 +30,7 @@ namespace AppLogin
                 var seeder = scope.ServiceProvider.GetService<SeedDb>();
                // seeder.SeedGamesAsync().Wait();
                 //seeder.SeedUserAsync().Wait();
-                seeder.SeedAsync().Wait();
+               // seeder.SeedAsync().Wait();
             }
         }
 

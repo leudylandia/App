@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AppLogin.Controllers
 {
-    [Authorize]
+    // [Authorize(Roles = "Admin")]
     public class GamesController : Controller
     {
         private readonly LoginDbContext _context;
@@ -24,7 +24,6 @@ namespace AppLogin.Controllers
             this._userHelper = userHelper;
         }
 
-        // GET: Games
         public async Task<IActionResult> Index()
         {
             return View(await _context.Games.ToListAsync());
@@ -49,6 +48,7 @@ namespace AppLogin.Controllers
         }
 
         // GET: Games/Create
+        [Authorize(Roles ="Admin")]
         public IActionResult Create()
         {
             return View();
@@ -73,6 +73,7 @@ namespace AppLogin.Controllers
         }
 
         // GET: Games/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -124,6 +125,7 @@ namespace AppLogin.Controllers
         }
 
         // GET: Games/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
