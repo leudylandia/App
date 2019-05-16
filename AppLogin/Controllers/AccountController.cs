@@ -1,22 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using AppLogin.Helpers;
 using AppLogin.Models.Entities;
 using AppLogin.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AppLogin.Controllers
 {
     public class AccountController : Controller
     {
         private readonly IUserHelper _userHelper;
+        private readonly IConfiguration _configuration; //Para acceder a los valores que hay en el appsetting.json, vamos acceder  a los token
 
-        public AccountController(IUserHelper userHelper)
+        public AccountController(IUserHelper userHelper, IConfiguration configuration)
         {
             this._userHelper = userHelper;
+            this._configuration = configuration;
         }
 
         public IActionResult Index()
@@ -189,8 +196,51 @@ namespace AppLogin.Controllers
                     ModelState.AddModelError(string.Empty, "User not found.");
                 }
             }
-
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateToken([FromBody] LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                //Buscamos para saber si ese usuario existe
+                var user = await _userHelper.FindUserByEmailAsync(model.Username);
+
+                if (user != null) //Si es null, no existe y lanzamos un badrequest
+                {
+                    var result = await _userHelper.ValidatePasswordAsync(user, model.Password); //Validamos que  usuario y password sea corecto
+
+                    if (result.Succeeded)
+                    {
+                        //Generamos los claim con el email del usuario y un Guid, cada llamado es unico
+                        var claims = new[]
+                        {
+                            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                        };
+
+                        //Generamos la llave con la clave simestrica, con el key que pusimos en el appsetting
+                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this._configuration["Tokens:Key"]));
+                        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); //Generamos la credenciales
+                        //Generamos el token
+                        var token = new JwtSecurityToken(_configuration["Tokens:Issuer"], 
+                            _configuration["Tokens:Audience"], 
+                            claims, expires: DateTime.UtcNow.AddDays(15), //Valido por 15 dias
+                            signingCredentials: credentials);
+
+                        var results = new
+                        {
+                            token = new JwtSecurityTokenHandler().WriteToken(token),
+                            expiration = token.ValidTo
+                        };
+
+                        return Created(string.Empty, results);
+                    }
+                }
+            }
+
+            return BadRequest();
         }
     }
 

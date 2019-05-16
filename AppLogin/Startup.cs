@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using AppLogin.Helpers;
 using AppLogin.Models;
@@ -14,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AppLogin
 {
@@ -54,16 +56,18 @@ namespace AppLogin
                 cfg.Password.RequireLowercase = false;
             }).AddEntityFrameworkStores<LoginDbContext>().AddDefaultTokenProviders();
 
-
-           // services.AddIdentity<User, IdentityRole>(cfg =>
-           //{
-           //    cfg.User.RequireUniqueEmail = true;
-           //    cfg.Password.RequireDigit = false;
-           //    cfg.Password.RequiredUniqueChars = 0;
-           //    cfg.Password.RequireNonAlphanumeric = false;
-           //    cfg.Password.RequireUppercase = false;
-           //    cfg.Password.RequiredLength = 4;
-           //});
+            //Le decimos a nuestra aplicacion que usaremos tokens
+            services.AddAuthentication()
+                .AddCookie()
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidIssuer = Configuration["Tokens:Issuer"],
+                        ValidAudience = Configuration["Tokens:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Tokens:Key"]))
+                    };
+                });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }

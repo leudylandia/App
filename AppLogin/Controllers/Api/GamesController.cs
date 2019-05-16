@@ -7,11 +7,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AppLogin.Models;
 using AppLogin.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
+using System.Net;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AppLogin.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class GamesController : ControllerBase
     {
         private readonly LoginDbContext _context;

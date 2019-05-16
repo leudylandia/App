@@ -15,7 +15,7 @@ namespace AppLogin.Helpers
         Task<SignInResult> LoginAsync(LoginViewModel model);
         Task LogoutAsync();
         Task<IdentityResult> UpdateUserAsync(User user);
-
         Task<IdentityResult> ChangePasswordAsync(User user, string oldpassword, string newPassword);
+        Task<SignInResult> ValidatePasswordAsync(User user, string password); //No loguea, solo dice si es valido para loguearse
     }
 }
