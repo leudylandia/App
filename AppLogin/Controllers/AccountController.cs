@@ -243,6 +243,11 @@ namespace AppLogin.Controllers
 
             return BadRequest();
         }
+
+        public IActionResult NotAuthorized()
+        {
+            return View();
+        }
     }
 
 }

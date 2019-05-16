@@ -38,6 +38,13 @@ namespace AppLogin
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            //Cuando requiera  login una accion o role y la persona no esta authorizado, le mando ese msj dela vista
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/NotAuthorized";
+                options.AccessDeniedPath = "/Account/NotAuthorized";
+            });
+
             services.AddDbContext<LoginDbContext>(option => option.UseSqlServer(Configuration.GetConnectionString("DefaultC")));
 
             services.AddTransient<SeedDb>();
@@ -84,6 +91,9 @@ namespace AppLogin
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
+            //Para cuando sea un error de 404
+            app.UseStatusCodePagesWithReExecute("/error/{0}");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

@@ -34,14 +34,14 @@ namespace AppLogin.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("GamesNotFound");
             }
 
             var game = await _context.Games
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (game == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("GamesNotFound");
             }
 
             return View(game);
@@ -157,6 +157,11 @@ namespace AppLogin.Controllers
         private bool GameExists(int id)
         {
             return _context.Games.Any(e => e.Id == id);
+        }
+
+        public IActionResult GamesNotFound()
+        {
+            return View();
         }
     }
 }

@@ -28,7 +28,8 @@
                 <span asp-validation-for="Console" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i>Create</button>
+                <a asp-action="Index" asp-controller="Games" class="btn btn-link">Back to list</a>
             </div>
         </form>
     </div>
