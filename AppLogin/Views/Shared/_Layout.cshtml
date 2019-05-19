@@ -34,7 +34,15 @@
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
-                    <li><a asp-area="" asp-controller="Games" asp-action="Index">Game</a></li>
+                    @if (this.User.Identity.IsAuthenticated)
+                    {
+                        <li><a asp-area="" asp-controller="Games" asp-action="Index">Game</a></li>
+                    }
+                    @if (this.User.IsInRole("Admin"))
+                    {
+                        <li><a asp-area="" asp-controller="Games" asp-action="Index">GameAdmin</a></li>
+                    }
+                    
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     @if (User.Identity.IsAuthenticated)
