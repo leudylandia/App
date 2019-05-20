@@ -51,9 +51,12 @@ namespace AppLogin
 
             //Inject
             services.AddScoped<IUserHelper, UserHelper>();
+            services.AddScoped<IMailHelper, MailHelper>();
 
             services.AddIdentity<User, IdentityRole>(cfg =>
             {
+                cfg.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider; //Esto para que valide el correo nos envia un link
+                cfg.SignIn.RequireConfirmedEmail = true; //Ponemos esto true para validar correo
                 cfg.User.RequireUniqueEmail = true;
                 cfg.Password.RequireDigit = false;
                 cfg.Password.RequiredUniqueChars = 0;

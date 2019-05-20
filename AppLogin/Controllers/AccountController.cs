@@ -19,11 +19,13 @@ namespace AppLogin.Controllers
     {
         private readonly IUserHelper _userHelper;
         private readonly IConfiguration _configuration; //Para acceder a los valores que hay en el appsetting.json, vamos acceder  a los token
+        private readonly IMailHelper _mailHelper;
 
-        public AccountController(IUserHelper userHelper, IConfiguration configuration)
+        public AccountController(IUserHelper userHelper, IConfiguration configuration, IMailHelper mailHelper)
         {
             this._userHelper = userHelper;
             this._configuration = configuration;
+            this._mailHelper = mailHelper;
         }
 
         public IActionResult Index()
@@ -96,6 +98,22 @@ namespace AppLogin.Controllers
                         return View(model);
                     }
 
+                    //Ante  logeabamos el usuario, ahora debe confirmar via email
+                    var myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                    var tokenLink = Url.Action("ConfirmEmail", "Account", new
+                    {
+                        userid = user.Id,
+                        token = myToken
+                    }, protocol: HttpContext.Request.Scheme);
+
+                    var msj = $"<h1>Email Confirmation</h1> To allow the user please click in this link:</br></br><a href={tokenLink}>Confirm Email </a>";
+
+                    _mailHelper.SendMail(model.Username, "Email Confirmation", msj);
+                    ViewBag.Message = "The instuction to allow you user has been sent to email.";
+                    return View(model);
+
+                    #region Loguear desde que se registre
+                    /* //Aqui inicia par loguear el usuario lo puse en comentario porque ahora estamos usando confirmacion de correo, no estamos logueando de una vez que se regustre
                     //Luego de que el usuario es creado procedemos a iniciar session, pasamos los datos a loginViewModel para enviarselo al metdo login
                     var loginVM = new LoginViewModel
                     {
@@ -116,6 +134,8 @@ namespace AppLogin.Controllers
                     //Es imposible de que llegue a esta parte, ya que si el usuario fue creado con exito, lo va a loggear
                     this.ModelState.AddModelError(string.Empty, "Could not be login.");
                     return View(model);
+                    */
+                    #endregion
                 }
 
                 ModelState.AddModelError(string.Empty, "The username is alredy registerd.");
@@ -123,6 +143,22 @@ namespace AppLogin.Controllers
             }
 
             return View(model);
+        }
+
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+                return NotFound();
+
+            var user = await _userHelper.GetUserByIdAsync(userId); //Validamos el usuario
+            if (user == null)
+                return NotFound();
+
+            var result = await _userHelper.ConfirmEmailAsync(user, token); //Ejecutamos el metodo de confirmacion del email
+            if (!result.Succeeded)
+                return NotFound();
+
+            return View();
         }
 
         public async Task<IActionResult> Logout()
