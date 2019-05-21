@@ -284,6 +284,60 @@ namespace AppLogin.Controllers
         {
             return View();
         }
-    }
 
+        public IActionResult RecoverPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RecoverPassword(RecoverPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.FindUserByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Email does not correspont to a registered user.");
+                    return View(model);
+                }
+
+                var myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+                var link = Url.Action("ResetPassword", "Account", new { Token = myToken }, protocol: HttpContext.Request.Scheme);
+                var mailSender = new MailHelper(_configuration);
+                var msj = $"<h1>Password Reset</h1> To reset the password click on link below :</br></br><a href={link}>Reset Password</a>";
+                mailSender.SendMail(model.Email, "Password Reset", msj);
+                ViewBag.Message = "The instructions to recover  your password has been sent to email";
+                return View();
+            }
+
+            return View(model);
+        }
+
+        public IActionResult ResetPassword(string token)
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            var user = await _userHelper.FindUserByEmailAsync(model.UserName);
+            if (user != null)
+            {
+                var result = await _userHelper.ResetPasswordAsync(user, model.Token, model.Password);
+                if (result.Succeeded)
+                {
+                    ViewBag.Message = "Password reset succssful.";
+                    return View();
+                }
+
+                ViewBag.Message = "Error while reseting password.";
+                return View(model);
+            }
+
+            ViewBag.Message = "User not found.";
+            return View(model);
+        }
+    }
 }
