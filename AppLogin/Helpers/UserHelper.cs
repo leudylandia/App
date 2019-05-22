@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AppLogin.Models.Entities;
 using AppLogin.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace AppLogin.Helpers
 {
@@ -106,6 +107,24 @@ namespace AppLogin.Helpers
         public async Task<IdentityResult> ResetPasswordAsync(User user, string token, string password)
         {
             return await _userManager.ResetPasswordAsync(user, token, password);
+        }
+
+        public async Task<List<User>> GetAllUserAsync()
+        {
+            return await _userManager.Users
+                .OrderBy(u => u.Name)
+                .ThenBy(u => u.LastName)
+                .ToListAsync();
+        }
+
+        public async Task RemoveUserFromRoleAsync(User user, string roleName)
+        {
+            await _userManager.RemoveFromRoleAsync(user, roleName);
+        }
+
+        public async Task DeleteUserAsync(User user)
+        {
+            await _userManager.DeleteAsync(user);
         }
     }
 }

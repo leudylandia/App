@@ -5,6 +5,7 @@
 }
 
 <h2>Index</h2>
+<link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet" />
 
 @if (this.User.IsInRole("Admin") || this.User.IsInRole("Customer")) /* El customer no tiene permiso a crear solo lo puse para probar y le aparezca la opcion */
 {
@@ -12,49 +13,73 @@
         <a asp-action="Create">Create New</a>
     </p>
 }
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Gender)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Console)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Gender)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Console)
-                </td>
-                @if (this.User.IsInRole("Admin"))
-                {
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    </td>
-                }
-                else
-                {
-                    <td>
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                    </td>
-                }
-            </tr>
-        }
-    </tbody>
-</table>
+
+    <div class="row">
+        <div class="col-md-12">
+           <div class="panel panel-default">
+               <div class="panel-heading">
+                   <h3 class="panel-title">Games</h3>
+               </div>
+               <div class="panel-body">
+                   <table class="table table-hover table-responsive table-striped">
+                       <thead>
+                           <tr>
+                               <th>
+                                   @Html.DisplayNameFor(model => model.Name)
+                               </th>
+                               <th>
+                                   @Html.DisplayNameFor(model => model.Gender)
+                               </th>
+                               <th>
+                                   @Html.DisplayNameFor(model => model.Console)
+                               </th>
+                               <th>Action</th>
+                           </tr>
+                       </thead>
+                       <tbody>
+                           @foreach (var item in Model)
+                           {
+                               <tr>
+                                   <td>
+                                       @Html.DisplayFor(modelItem => item.Name)
+                                   </td>
+                                   <td>
+                                       @Html.DisplayFor(modelItem => item.Gender)
+                                   </td>
+                                   <td>
+                                       @Html.DisplayFor(modelItem => item.Console)
+                                   </td>
+                                   @if (this.User.IsInRole("Admin"))
+                                   {
+                                       <td>
+                                           <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                                           <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                                           <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                                       </td>
+                                   }
+                                   else
+                                   {
+                                       <td>
+                                           <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                                       </td>
+                                   }
+                               </tr>
+                           }
+                       </tbody>
+                   </table>
+               </div>
+           </div>
+        </div>
+    </div>
+
+@section Scripts{ 
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.table').DataTable();
+
+        });
+    </script>
+
+    
+}

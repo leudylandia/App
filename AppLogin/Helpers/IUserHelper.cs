@@ -27,5 +27,8 @@ namespace AppLogin.Helpers
 
         Task<string> GeneratePasswordResetTokenAsync(User user);
         Task<IdentityResult> ResetPasswordAsync(User user, string token, string password);
+        Task<List<User>> GetAllUserAsync();
+        Task RemoveUserFromRoleAsync(User user, string role);
+        Task DeleteUserAsync(User user);
     }
 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AppLogin.Helpers;
 using AppLogin.Models.Entities;
 using AppLogin.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -28,9 +29,21 @@ namespace AppLogin.Controllers
             this._mailHelper = mailHelper;
         }
 
-        public IActionResult Index()
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Index()
         {
-            return View();
+             var users = await this._userHelper.GetAllUserAsync();
+
+           //Lamda users.ForEach(async u => u.IsAdmin = await _userHelper.IsUserInRoleAsync(u, "Admin"));
+
+            foreach (var item in users)
+            {
+                var myUser = await _userHelper.GetUserByIdAsync(item.Id);
+                if (myUser == null)
+                    item.IsAdmin = await _userHelper.IsUserInRoleAsync(myUser, "Admin");
+            }
+
+            return View(users);
         }
 
         public IActionResult Login()
@@ -338,6 +351,49 @@ namespace AppLogin.Controllers
 
             ViewBag.Message = "User not found.";
             return View(model);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminOff(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return NotFound();
+
+            var user = await _userHelper.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            await _userHelper.RemoveUserFromRoleAsync(user, "Admin");
+            return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminOn(string id)
+        {
+            //TODO: Revisar que no presenta los admin y no  lo quita
+            if (string.IsNullOrEmpty(id))
+                return NotFound();
+
+            var user = await _userHelper.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            await _userHelper.AddUserToRoleAsync(user, "Admin");
+            return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return NotFound();
+
+            var user = await _userHelper.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            await _userHelper.DeleteUserAsync(user);
+            return RedirectToAction(nameof(Index));
         }
     }
 }
