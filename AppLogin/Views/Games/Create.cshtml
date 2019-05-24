@@ -61,7 +61,7 @@
                     url: '/Games/Create',
                     data: hola,
                     success: function (result) {
-                        window.location = '/Games/Index';
+                        window.location = '/Games/Index'; //Le puse eso para que regrese dos veces al metodo create, porque primero iba por la peticion de ajax y luego el formulario iba de nuevo
                     },
                     error: function (error) {
                         alert.error('Something Wrong!');
