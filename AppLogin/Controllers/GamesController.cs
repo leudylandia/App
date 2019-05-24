@@ -65,8 +65,8 @@ namespace AppLogin.Controllers
             {
                 var correo = User.Identity.Name;
                 game.User = await _userHelper.FindUserByEmailAsync(correo);
-                _context.Add(game);
-                await _context.SaveChangesAsync();
+                //_context.Add(game);
+                //await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(game);

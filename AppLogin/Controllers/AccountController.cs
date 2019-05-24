@@ -39,7 +39,7 @@ namespace AppLogin.Controllers
             foreach (var item in users)
             {
                 var myUser = await _userHelper.GetUserByIdAsync(item.Id);
-                if (myUser == null)
+                if (myUser != null)
                     item.IsAdmin = await _userHelper.IsUserInRoleAsync(myUser, "Admin");
             }
 
