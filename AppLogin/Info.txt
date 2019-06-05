@@ -8,3 +8,20 @@
 
 COrreo
 https://myaccount.google.com/lesssecureapps
+
+1- crear la  carpeta en C
+2- Agregarla a visual code
+3 - dotnet new webapi -o DatingApp.API -n DatingApp.API
+4 - Crear la carpeta model y crear los  modelos
+5 - Crear otra carpeta y crear la clase del context y que herede de DbContext
+6 - Creamos el DbSet d e los modelos
+7 - Ponemos la configuracion de  conexion en el startup s.AddDbContext<DataContext>(o => o.UseSqlServer("conexion"))
+8 - en el appsetting creamos la conexion "ConnectionStrings": {
+        "DefaultC": "Data source=(localdb)\\MSSQLLocalDB; Initial Catalog=dbAgular; Integrated Security=true"},
+9- Creamos la migration con donet ef migrations add InitialCreate
+10- Actualizamos  la db dotnet ef database  update
+11- Creamos el  proyecto de andular ng new name
+12- Crer los componentes ng c g 
+11- en el appmodule agregar en (import) import { HttpClientModule } from '@angular/common/http';
+12- services.AddCors();   app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+13- ng g s shared/name

@@ -1,0 +1,55 @@
+﻿
+@{
+    ViewData["Title"] = "Usando Jquery Ajax";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Sec</th>
+            <th>Codigo</th>
+            <th>Nombre</th>
+            <th>Genero</th>
+            <th>Consola</th>
+            <th>Accion</th>
+        </tr>
+    </thead>
+    <tbody id="data"></tbody>
+</table>
+
+@section Scripts{
+    @{ await Html.RenderPartialAsync("_validationScriptsPartial");}
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#data').html('');
+            var row = '';
+            var link = 'Hola';
+
+           // alert('Ya si estamos listo');
+            swal("Here's a message!", "We are ready to fight!");
+
+            $.ajax({
+                type: 'GET',
+                url: '/Games/DatosIndex2',
+                data: [],
+                success: function (result) {
+                    console.log(result);
+                    $.each(result, function (index, dato) {
+                        console.log(dato); //imprimo por consola el item
+                        link = '<a href="/games/Details/' + dato.id + '"' + 'class="btn btn-info"><i class="glyphicon glyphicon-info-sign"></i></a>';
+                        row += '<tr><td>' + (index + 1) + '</td><td>' + dato.id + '</td><td>' + dato.name + '</td><td>' + dato.gender + '</td><td>' + dato.console + '</td><td>' + link + '</td></tr>';
+
+                    });
+
+                    $('#data').append(row);
+                },
+                error: function (result) {
+                    $('#data').html('');
+                }
+            });
+        });
+    </script>
+}

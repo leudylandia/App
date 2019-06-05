@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AppLogin.Controllers
 {
-    // [Authorize(Roles = "Admin")]
+    [Authorize]
     public class GamesController : Controller
     {
         private readonly LoginDbContext _context;
@@ -27,6 +27,17 @@ namespace AppLogin.Controllers
         public async Task<IActionResult> Index()
         {
             return View(await _context.Games.ToListAsync());
+        }
+
+        public IActionResult Index2()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> DatosIndex2()
+        {
+            var resultado = await _context.Games.ToListAsync();
+            return Json(resultado);
         }
 
         // GET: Games/Details/5
